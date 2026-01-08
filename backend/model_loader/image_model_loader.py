@@ -1,7 +1,7 @@
 # model_loader/image_model_loader.py
 import torch
 from huggingface_hub import hf_hub_download
-from utils.image_preprocessing import ImagePreprocessor
+from backend.utils.image_preprocessing import ImagePreprocessor
 
 HF_REPO_ID = "sarimahsan101/xray_disease_cnn_model"
 HF_FILENAME = "cnn_model_full.pt"  # use the full model
