@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 # from utils.geminiint import explain_condition 
-from schemas.request import TextInput
-from model_loader.symptom_loader import explainer
+from backend.schemas.request import TextInput
+from backend.model_loader.symptom_loader import explainer
 from fastapi import APIRouter, UploadFile, File
 from PIL import Image
-from model_loader.image_model_loader import CNNPredictor
+from backend.model_loader.image_model_loader import CNNPredictor
 
 app = FastAPI()
 app.add_middleware(
