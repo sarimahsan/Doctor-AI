@@ -19,4 +19,4 @@ uvicorn[standard]>=0.23.0
 # Utilities
 python-dotenv>=1.0.0
 httpx
-sklearn
+scikit-learn
