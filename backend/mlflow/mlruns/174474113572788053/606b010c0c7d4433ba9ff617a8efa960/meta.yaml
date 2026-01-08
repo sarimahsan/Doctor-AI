@@ -1,0 +1,14 @@
+artifact_uri: file:///kaggle/working/mlruns/174474113572788053/606b010c0c7d4433ba9ff617a8efa960/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '174474113572788053'
+lifecycle_stage: active
+run_id: 606b010c0c7d4433ba9ff617a8efa960
+run_name: silent-snail-831
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1767722560579
+status: 1
+tags: []
+user_id: root

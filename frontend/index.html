@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediChat AI - Symptom Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        body.dark {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+        }
+
+        body.light {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: #000;
+        }
+
+        .container {
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-content {
+            display: inline-block;
+            padding: 1.5rem 3rem;
+            border-radius: 1.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .dark .header-content {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .light .header-content {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(to right, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .settings-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            transition: background-color 0.2s;
+        }
+
+        .dark .settings-bar {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        .light .settings-bar {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .settings-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toggle-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dark .toggle-btn {
+            background: rgba(55, 65, 81, 1);
+            color: #fff;
+        }
+
+        .light .toggle-btn {
+            background: rgba(243, 244, 246, 1);
+            color: #000;
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .chat-panel {
+            border-radius: 1.5rem;
+            overflow: hidden;
+            transition: background-color 0.2s;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .chat-panel {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        .light .chat-panel {
+            background: white;
+        }
+
+        .chat-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid;
+            transition: border-color 0.2s;
+        }
+
+        .dark .chat-header {
+            border-color: rgba(75, 85, 99, 0.5);
+        }
+
+        .light .chat-header {
+            border-color: rgba(229, 231, 235, 1);
+        }
+
+        .chat-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .chat-header p {
+            font-size: 0.875rem;
+            opacity: 0.7;
+        }
+
+        .messages-container {
+            height: 500px;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+
+        .empty-state svg {
+            width: 4rem;
+            height: 4rem;
+            opacity: 0.5;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            opacity: 0.7;
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+
+        .example-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .example-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dark .example-btn {
+            background: rgba(55, 65, 81, 1);
+            color: rgba(209, 213, 219, 1);
+        }
+
+        .light .example-btn {
+            background: rgba(243, 244, 246, 1);
+            color: rgba(55, 65, 81, 1);
+        }
+
+        .example-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .message {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .message-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .bot-avatar {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+        }
+
+        .user-avatar {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.5;
+        }
+
+        .confidence-badge {
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .confidence-high {
+            color: #86efac;
+        }
+
+        .message-text {
+            padding: 1rem;
+            border-radius: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .dark .message-text {
+            background: rgba(55, 65, 81, 0.5);
+        }
+
+        .light .message-text {
+            background: rgba(243, 244, 246, 1);
+        }
+
+        .user-message .message-text {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            color: white;
+        }
+
+        .top-predictions {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .dark .top-predictions {
+            background: rgba(17, 24, 39, 0.5);
+        }
+
+        .light .top-predictions {
+            background: rgba(249, 250, 251, 1);
+        }
+
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s;
+        }
+
+        .dark .prediction-item {
+            background: rgba(31, 41, 55, 1);
+        }
+
+        .light .prediction-item {
+            background: white;
+        }
+
+        .prediction-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .prediction-number {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .confidence-indicator {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .confidence-high-bg {
+            background: rgba(34, 197, 94, 0.1);
+            color: #86efac;
+        }
+
+        .dark .confidence-high-bg {
+            background: rgba(20, 83, 45, 0.3);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 0.25rem;
+            padding: 1rem;
+            border-radius: 1rem;
+        }
+
+        .dark .typing-dots {
+            background: rgba(55, 65, 81, 0.5);
+        }
+
+        .light .typing-dots {
+            background: rgba(243, 244, 246, 1);
+        }
+
+        .dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.5;
+            animation: bounce 1.4s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .input-area {
+            padding: 1.5rem;
+            border-top: 1px solid;
+            transition: border-color 0.2s;
+        }
+
+        .dark .input-area {
+            border-color: rgba(75, 85, 99, 0.5);
+        }
+
+        .light .input-area {
+            border-color: rgba(229, 231, 235, 1);
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .input-textarea {
+            width: 100%;
+            padding: 0.75rem 3rem 0.75rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid;
+            resize: none;
+            min-height: 60px;
+            max-height: 120px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .dark .input-textarea {
+            background: rgba(55, 65, 81, 1);
+            border-color: rgba(75, 85, 99, 1);
+            color: white;
+        }
+
+        .light .input-textarea {
+            background: rgba(249, 250, 251, 1);
+            border-color: rgba(209, 213, 219, 1);
+            color: black;
+        }
+
+        .input-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .send-btn {
+            position: absolute;
+            right: 0.75rem;
+            bottom: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: linear-gradient(to right, #3b82f6, #06b6d4);
+            color: white;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .send-btn:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel-card {
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            transition: background-color 0.2s;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .panel-card {
+            background: rgba(30, 41, 59, 1);
+        }
+
+        .light .panel-card {
+            background: white;
+        }
+
+        .panel-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .topk-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .topk-btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .topk-btn.active {
+            background: linear-gradient(to right, #3b82f6, #06b6d4);
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .topk-btn:not(.active) {
+            background: rgba(55, 65, 81, 1);
+            color: rgba(209, 213, 219, 1);
+        }
+
+        .light .topk-btn:not(.active) {
+            background: rgba(243, 244, 246, 1);
+            color: rgba(55, 65, 81, 1);
+        }
+
+        .topk-btn:not(.active):hover {
+            transform: translateY(-2px);
+        }
+
+        .upload-zone {
+            border: 2px dashed;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dark .upload-zone {
+            border-color: rgba(75, 85, 99, 1);
+        }
+
+        .light .upload-zone {
+            border-color: rgba(209, 213, 219, 1);
+        }
+
+        .upload-zone:hover {
+            border-color: #3b82f6;
+        }
+
+        .dark .upload-zone:hover {
+            background: rgba(30, 58, 138, 0.2);
+        }
+
+        .light .upload-zone:hover {
+            background: rgba(239, 246, 255, 1);
+        }
+
+        .upload-icon {
+            width: 3rem;
+            height: 3rem;
+            margin: 0 auto 0.75rem;
+            opacity: 0.5;
+        }
+
+        .status-message {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+        }
+
+        .status-error {
+            background: rgba(153, 27, 27, 0.3);
+            color: #fca5a5;
+        }
+
+        .light .status-error {
+            background: rgba(254, 242, 242, 1);
+            color: rgba(185, 28, 28, 1);
+        }
+
+        .status-success {
+            background: rgba(20, 83, 45, 0.3);
+            color: #86efac;
+        }
+
+        .light .status-success {
+            background: rgba(240, 253, 244, 1);
+            color: rgba(21, 128, 61, 1);
+        }
+
+        .close-btn {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        .supported-types {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .dark .supported-types {
+            background: rgba(17, 24, 39, 0.5);
+        }
+
+        .light .supported-types {
+            background: rgba(249, 250, 251, 1);
+        }
+
+        .supported-types h4 {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .type-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .type-tag {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid;
+        }
+
+        .dark .type-tag {
+            background: rgba(55, 65, 81, 1);
+            color: rgba(209, 213, 219, 1);
+            border-color: rgba(75, 85, 99, 1);
+        }
+
+        .light .type-tag {
+            background: white;
+            color: rgba(55, 65, 81, 1);
+            border-color: rgba(229, 231, 235, 1);
+        }
+
+        .tips-card {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.2), rgba(8, 145, 178, 0.2));
+            border: 1px solid rgba(30, 58, 138, 0.2);
+        }
+
+        .light .tips-card {
+            background: linear-gradient(135deg, rgba(239, 246, 255, 1), rgba(224, 242, 254, 1));
+            border: 1px solid rgba(191, 219, 254, 1);
+        }
+
+        .tips-list {
+            list-style: none;
+        }
+
+        .tips-list li {
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .tip-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background: #60a5fa;
+            margin-top: 0.375rem;
+            flex-shrink: 0;
+        }
+
+        .dark .tip-dot {
+            background: #60a5fa;
+        }
+
+        .light .tip-dot {
+            background: #3b82f6;
+        }
+
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.875rem;
+            opacity: 0.6;
+        }
+
+        footer p {
+            margin-bottom: 0.25rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Spinning loader */
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body class="dark">
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>🏥 MediChat AI</h1>
+                <p class="header-subtitle">Symptom Checker</p>
+            </div>
+        </div>
+
+        <!-- Settings Bar -->
+        <div class="settings-bar">
+            <div class="settings-info">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <span>Top <strong id="topKDisplay">1</strong> predictions</span>
+            </div>
+            <button class="toggle-btn" onclick="toggleDarkMode()">
+                <svg id="moonIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+                <svg id="sunIcon" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Left Panel - Chat -->
+            <div class="chat-panel">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <h2>Symptom Analysis</h2>
+                    <p>AI-powered medical consultation</p>
+                </div>
+
+                <!-- Messages Area -->
+                <div class="messages-container" id="messagesContainer">
+                    <div id="emptyState" class="empty-state">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        <h3>Start Your Consultation</h3>
+                        <p>Describe your symptoms or upload a medical image for analysis. I'll help identify potential conditions with confidence scores.</p>
+                        <div class="example-buttons">
+                            <button class="example-btn" onclick="setExampleText('I have a headache and nausea')">
+                                Example: Headache
+                            </button>
+                            <button class="example-btn" onclick="setExampleText('Cough with fever for 3 days')">
+                                Example: Cough & Fever
+                            </button>
+                        </div>
+                    </div>
+                    <div id="messagesArea"></div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="input-area">
+                    <div class="input-container">
+                        <textarea 
+                            id="messageInput" 
+                            class="input-textarea" 
+                            placeholder="Describe your symptoms... (Press Enter to send)"
+                            rows="1"
+                        ></textarea>
+                        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"/>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="right-panel">
+                <!-- Top K Selection -->
+                <div class="panel-card">
+                    <h3>Prediction Settings</h3>
+                    <div>
+                        <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.75rem;">
+                            Number of Predictions
+                        </label>
+                        <div class="topk-buttons">
+                            <button class="topk-btn active" onclick="setTopK(1)">Top 1</button>
+                            <button class="topk-btn" onclick="setTopK(3)">Top 3</button>
+                            <button class="topk-btn" onclick="setTopK(5)">Top 5</button>
+                        </div>
+                        <p style="font-size: 0.875rem; opacity: 0.7; margin-top: 0.75rem;">
+                            Shows the <span id="topKText">1</span> most likely conditions based on your symptoms
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="panel-card">
+                    <h3>Medical Image Analysis</h3>
+                    <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
+                        <div>
+                            <svg id="uploadIcon" class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <svg id="loadingIcon" class="upload-icon spinner hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="2" x2="12" y2="6"/>
+                                <line x1="12" y1="18" x2="12" y2="22"/>
+                                <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/>
+                                <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+                                <line x1="2" y1="12" x2="6" y2="12"/>
+                                <line x1="18" y1="12" x2="22" y2="12"/>
+                                <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/>
+                                <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
+                            </svg>
+                            <p style="font-weight: 500; margin-bottom: 0.25rem;" id="uploadText">Upload Medical Image</p>
+                            <p style="font-size: 0.875rem; opacity: 0.7;">X-Ray, CT Scan, or Medical Images</p>
+                        </div>
+                    </div>
+
+                    <!-- Upload Status Messages -->
+                    <div id="uploadError" class="status-message status-error hidden">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <p id="uploadErrorText"></p>
+                        <button class="close-btn" onclick="document.getElementById('uploadError').classList.add('hidden')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div id="uploadSuccess" class="status-message status-success hidden">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        <p id="uploadSuccessText"></p>
+                        <button class="close-btn" onclick="document.getElementById('uploadSuccess').classList.add('hidden')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Supported Types -->
+                    <div class="supported-types">
+                        <h4>Supported Image Types:</h4>
+                        <div class="type-tags">
+                            <span class="type-tag">COVID</span>
+                            <span class="type-tag">Lung Opacity</span>
+                            <span class="type-tag">Normal</span>
+                            <span class="type-tag">Viral Pneumonia</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Tips -->
+                <div class="panel-card tips-card">
+                    <h3>Tips for Better Analysis</h3>
+                    <ul class="tips-list">
+                        <li>
+                            <div class="tip-dot"></div>
+                            <span>Be specific about symptoms (e.g., 'sharp pain in lower right abdomen')</span>
+                        </li>
+                        <li>
+                            <div class="tip-dot"></div>
+                            <span>Include duration (e.g., 'headache for 2 days')</span>
+                        </li>
+                        <li>
+                            <div class="tip-dot"></div>
+                            <span>Upload clear, well-lit medical images</span>
+                        </li>
+                        <li>
+                            <div class="tip-dot"></div>
+                            <span>This is an AI assistant - always consult a real doctor for serious concerns</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>© 2024 MediChat AI. This tool provides AI-powered suggestions and is not a substitute for professional medical advice.</p>
+            <p>Always consult with a qualified healthcare provider for medical concerns.</p>
+        </footer>
+    </div>
+
+    <script>
+        let messages = [];
+        let selectedTopK = 1;
+        let isTyping = false;
+
+        // Initialize
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function toggleDarkMode() {
+            const body = document.body;
+            const moonIcon = document.getElementById('moonIcon');
+            const sunIcon = document.getElementById('sunIcon');
+            
+            if (body.classList.contains('dark')) {
+                body.classList.remove('dark');
+                body.classList.add('light');
+                moonIcon.classList.add('hidden');
+                sunIcon.classList.remove('hidden');
+            } else {
+                body.classList.remove('light');
+                body.classList.add('dark');
+                moonIcon.classList.remove('hidden');
+                sunIcon.classList.add('hidden');
+            }
+        }
+
+        function setTopK(k) {
+            selectedTopK = k;
+            document.getElementById('topKDisplay').textContent = k;
+            document.getElementById('topKText').textContent = k;
+            
+            // Update button states
+            const buttons = document.querySelectorAll('.topk-btn');
+            buttons.forEach((btn, index) => {
+                if ([1, 3, 5][index] === k) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function setExampleText(text) {
+            document.getElementById('messageInput').value = text;
+            document.getElementById('messageInput').focus();
+        }
+
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function hideEmptyState() {
+            document.getElementById('emptyState').classList.add('hidden');
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (!text || isTyping) return;
+
+            hideEmptyState();
+
+            // Add user message
+            const userMessage = {
+                id: Date.now(),
+                text: text,
+                sender: 'user',
+                timestamp: getCurrentTime()
+            };
+            
+            messages.push(userMessage);
+            renderMessages();
+            input.value = '';
+            
+            // Show typing indicator
+            isTyping = true;
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        top_k: selectedTopK
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+
+                const data = await response.json();
+
+                // Add bot message
+                const botMessage = {
+                    id: Date.now() + 1,
+                    text: data.predicted_label,
+                    sender: 'bot',
+                    timestamp: getCurrentTime(),
+                    data: data,
+                    confidence: data.confidence
+                };
+
+                messages.push(botMessage);
+                hideTypingIndicator();
+                renderMessages();
+            } catch (error) {
+                console.error('Error sending message:', error);
+                const errorMessage = {
+                    id: Date.now() + 1,
+                    text: 'Sorry, I encountered an error. Please try again.',
+                    sender: 'bot',
+                    timestamp: getCurrentTime(),
+                    isError: true
+                };
+                messages.push(errorMessage);
+                hideTypingIndicator();
+                renderMessages();
+            } finally {
+                isTyping = false;
+            }
+        }
+
+        function showTypingIndicator() {
+            const messagesArea = document.getElementById('messagesArea');
+            const typingHTML = `
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="message-avatar bot-avatar">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">AI Assistant</span>
+                        </div>
+                        <div class="typing-dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            messagesArea.insertAdjacentHTML('beforeend', typingHTML);
+            scrollToBottom();
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        function renderMessages() {
+            const messagesArea = document.getElementById('messagesArea');
+            messagesArea.innerHTML = messages.map(message => {
+                if (message.sender === 'user') {
+                    return `
+                        <div class="message">
+                            <div class="message-avatar user-avatar">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">You</span>
+                                    <span class="message-time">${message.timestamp}</span>
+                                </div>
+                                <div class="message-text user-message">
+                                    <p>${escapeHtml(message.text)}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="message">
+                            <div class="message-avatar bot-avatar">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">AI Assistant</span>
+                                    <span class="message-time">${message.timestamp}</span>
+                                    ${message.confidence ? `
+                                        <span class="confidence-badge confidence-high">
+                                            ${(message.confidence * 100).toFixed(1)}%
+                                        </span>
+                                    ` : ''}
+                                </div>
+                                <div class="message-text">
+                                    ${message.isImageResult ? `
+                                        <p><strong>Image Analysis Result:</strong></p>
+                                        <p><strong>Condition:</strong> ${escapeHtml(message.imageLabel)}</p>
+                                        <p><strong>Confidence:</strong> High</p>
+                                    ` : `
+                                        <p>${escapeHtml(message.text)}</p>
+                                    `}
+                                </div>
+                                ${message.data?.top_predictions ? `
+                                    <div class="top-predictions">
+                                        <p style="font-weight: 600; margin-bottom: 0.75rem;">Top ${selectedTopK} Predictions:</p>
+                                        ${message.data.top_predictions.map((pred, index) => `
+                                            <div class="prediction-item">
+                                                <div class="prediction-label">
+                                                    <div class="prediction-number">${index + 1}</div>
+                                                    <span>${escapeHtml(pred.label)}</span>
+                                                </div>
+                                                <span style="font-weight: 600;">${(pred.probability * 100).toFixed(1)}%</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                                ${message.confidence ? `
+                                    <div class="confidence-indicator confidence-high-bg">
+                                        ${message.confidence > 0.9 ? `
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                                <polyline points="22 4 12 14.01 9 11.01"/>
+                                            </svg>
+                                        ` : `
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                            </svg>
+                                        `}
+                                        <span>${message.confidence > 0.9 ? 'High confidence' : message.confidence > 0.7 ? 'Medium confidence' : 'Low confidence'}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+            scrollToBottom();
+        }
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showError('Please upload an image file (JPEG, PNG, etc.)');
+                return;
+            }
+
+            // Show loading state
+            document.getElementById('uploadIcon').classList.add('hidden');
+            document.getElementById('loadingIcon').classList.remove('hidden');
+            document.getElementById('uploadText').textContent = 'Processing Image...';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/predict-image', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Image upload failed');
+                }
+
+                const result = await response.json();
+
+                if (result.error) {
+                    showError(result.error);
+                } else {
+                    showSuccess(`Image prediction: ${result.prediction_label}`);
+                    
+                    // Add image result as a bot message
+                    hideEmptyState();
+                    const botMessage = {
+                        id: Date.now(),
+                        text: `**Image Analysis Result:**\n\n**Condition:** ${result.prediction_label}\n**Confidence:** High`,
+                        sender: 'bot',
+                        timestamp: getCurrentTime(),
+                        isImageResult: true,
+                        imageLabel: result.prediction_label
+                    };
+                    
+                    messages.push(botMessage);
+                    renderMessages();
+                }
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                showError('Failed to process image. Please try again.');
+            } finally {
+                // Reset upload UI
+                document.getElementById('uploadIcon').classList.remove('hidden');
+                document.getElementById('loadingIcon').classList.add('hidden');
+                document.getElementById('uploadText').textContent = 'Upload Medical Image';
+                event.target.value = '';
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('uploadError');
+            const errorText = document.getElementById('uploadErrorText');
+            errorText.textContent = message;
+            errorDiv.classList.remove('hidden');
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('uploadSuccess');
+            const successText = document.getElementById('uploadSuccessText');
+            successText.textContent = message;
+            successDiv.classList.remove('hidden');
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('messagesContainer');
+            setTimeout(() => {
+                container.scrollTop = container.scrollHeight;
+            }, 100);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+artifact_uri: file:///kaggle/working/mlruns/174474113572788053/0bc03a80e920490abf7c5dd31642007f/artifacts
+end_time: 1767722409775
+entry_point_name: ''
+experiment_id: '174474113572788053'
+lifecycle_stage: active
+run_id: 0bc03a80e920490abf7c5dd31642007f
+run_name: sassy-dolphin-614
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1767718593980
+status: 3
+tags: []
+user_id: root

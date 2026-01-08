@@ -1,0 +1,5 @@
+env:
+  DATASET_URL: "https://www.kaggle.com/datasets/sarimahsan/daugmented-model"
+
+env:
+  DATASET_URL: "https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database"

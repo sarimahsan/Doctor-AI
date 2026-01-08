@@ -1,0 +1,14 @@
+artifact_uri: file:///kaggle/working/mlruns/174474113572788053/8f73d9e873244b74b438de101429d9b8/artifacts
+end_time: 1767718591835
+entry_point_name: ''
+experiment_id: '174474113572788053'
+lifecycle_stage: active
+run_id: 8f73d9e873244b74b438de101429d9b8
+run_name: bold-conch-356
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1767718584650
+status: 3
+tags: []
+user_id: root

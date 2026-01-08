@@ -1,0 +1,6 @@
+artifact_location: file:///kaggle/working/mlruns/174474113572788053
+creation_time: 1767718558621
+experiment_id: '174474113572788053'
+last_update_time: 1767718558621
+lifecycle_stage: active
+name: cnn-training
