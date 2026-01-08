@@ -2,7 +2,7 @@ import torch
 import joblib
 from huggingface_hub import hf_hub_download
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from utils.explain import ExplainableClassifier
+from backend.utils.explain import ExplainableClassifier
 import os
 from dotenv import load_dotenv
 
