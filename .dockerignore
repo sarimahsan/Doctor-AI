@@ -1,0 +1,33 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Git and version control
+.git/
+.gitignore
+
+# Environment / virtualenv
+.venv/
+.env
+*.env
+
+# Logs
+logs/
+*.log
+
+# Datasets and Hugging Face models
+data/
+models/
+.cache/
+transformers_cache/
+
+# OS / IDE files
+.DS_Store
+.idea/
+.vscode/
+
+# Temporary files
+*.tmp
+*.swp

@@ -1037,7 +1037,7 @@
             showTypingIndicator();
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/predict', {
+                const response = await fetch('http://51.20.138.191:8000/predict', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1226,7 +1226,7 @@
             formData.append('file', file);
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/predict-image', {
+                const response = await fetch('http://51.20.138.191:8000/predict-image', {
                     method: 'POST',
                     body: formData,
                 });
